@@ -41,15 +41,19 @@ selected_age = st.slider("Select Age to view BmiClass distribution about", min_v
 
 # Filter data based on selected age
 filtered_data_pie = data[data['Age'] == selected_age]
-
+custom_labels=['Obese Class 1','Overweight','Underweight','Obese Class 2','Normal Weight','Obese Class 3']
 # Create a pie chart for BMI class distribution based on the selected age
 st.write(f"### BMI Class Distribution for Age {selected_age}")
 # Define a color scale ranging from a bright color to a dark color
 color_scale = px.colors.sequential.Blues[::-1]
+
+# Get the BMI class counts for the selected age
+bmi_class_counts = filtered_data_pie['BmiClass'].value_counts()
+
+# Create a pie chart
 fig_pie_age = px.pie(
-    filtered_data_pie['BmiClass'].value_counts().reset_index(),
-    names='BmiClass',
-    values='BmiClass',
+    names=bmi_class_counts.index,  # Use class names here
+    values=bmi_class_counts.values,  # Use class counts here
     title=f'BMI Class Distribution for Age {selected_age}',
     color_discrete_sequence=color_scale,
 )
@@ -107,3 +111,6 @@ st.plotly_chart(fig_bar)
 
 # Display the explanation for the bar plot
 st.write("This bar plot displays the average BMI for each age group. It provides insights into how BMI varies across different age groups, helping to identify potential trends or patterns. For example, the average bmi for age 34 is about 25.")
+
+
+
