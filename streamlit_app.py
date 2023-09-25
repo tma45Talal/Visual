@@ -2,16 +2,9 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 
 # Load the dataset
-data = pd.read_csv('bmi.csv')
+data = pd.read_csv("bmi.csv")
 
 # Create a Streamlit app title
 st.title('BMI Class Analysis')
@@ -19,14 +12,10 @@ st.title('BMI Class Analysis')
 # Add some information about the data
 st.write("The dataset contains information about Age, Height, Weight, BMI, and BMI Class.")
 
-
+st.write("Note that bmi=weight/height^2")
 if st.checkbox('Show raw data'):
     st.subheader('Raw data')
     st.write(data)
-
-
-
-
 
 st.write("**You can view data about specific BmiClass**")
 # Add an interactive feature to filter data by BMI Class
@@ -34,8 +23,6 @@ selected_bmi_class = st.multiselect("Select BMI Class", data['BmiClass'].unique(
 filtered_data = data[data['BmiClass'].isin(selected_bmi_class)]
 st.write("Filtered Data:")
 st.write(filtered_data)
-
-
 
 # Add an interactive feature to display summary statistics
 st.subheader("Summary Statistics About Age and Bmi")
@@ -47,47 +34,7 @@ else:
     st.write("Summary Statistics for BMI:")
     st.write(data['Bmi'].describe())
 
-
-
 st.subheader("Visualizations")
-st.write("**Box plot of Bmi vs BmiClass**")
-st.write("You can hover over the boxes to see Age and BMI information.")
-# Create the box plot figure with custom colors
-fig2 = px.box(
-    data,
-    x="BmiClass",
-    y="Bmi",
-    title="BMI Distribution by BMI Class",
-    color_discrete_sequence=["#003366"],
-    hover_data=["Age"],  # Add Age as hover information
-)
-# Customize the layout for zooming and panning
-fig2.update_xaxes(showline=True, linewidth=1, linecolor='black', fixedrange=True)
-fig2.update_yaxes(showline=True, linewidth=1, linecolor='black', fixedrange=True)
-
-
-# Set the background color to be transparent
-fig2.update_layout({
-    'plot_bgcolor': 'rgba(0, 0, 0, 0)',  # Transparent background
-    'paper_bgcolor': 'rgba(0, 0, 0, 0)'  # Transparent plot area
-})
-
-# Add hover template to display Age and Bmi values
-fig2.update_traces(hovertemplate='Age: %{customdata[0]}<br>BMI: %{y}')
-# Enable the legend
-fig2.update_layout(showlegend=True)
-
-# Show the updated figure
-st.plotly_chart(fig2)
-
-
-
-
-
-# Assuming 'data' is your DataFrame containing the necessary information
-
-# Visualizations
-st.write("## Visualizations")
 
 # Interactive Feature: Select Age for Filtering
 selected_age = st.slider("Select Age to view BmiClass distribution about", min_value=int(data['Age'].min()), max_value=int(data['Age'].max()))
@@ -113,45 +60,50 @@ fig_pie_age.update_traces(textinfo='percent+label', textfont_size=14)
 # Enable the legend
 fig_pie_age.update_layout(showlegend=True)
 
+# Display the explanation for the pie chart
+st.write("The following pie chart shows the distribution of BMI classes for the selected age. Each segment represents a BMI class, and the percentage label indicates the proportion of individuals in each class.")
+
+# Display the pie chart
 st.plotly_chart(fig_pie_age)
 
 
-
-
-
-
-import streamlit as st
-import plotly.express as px
-import pandas as pd
-
-# Assuming 'data' is your DataFrame containing the necessary information
-
-# Visualizations
-
-
-# Scatter plot for Age vs. BMI
-#st.write("### Scatter Plot of Age vs. BMI")
-#fig_age_bmi = px.scatter(data, x="Age", y="Bmi", title="Age vs. BMI Scatter Plot", color="BmiClass")
-
-# Add interactive features
-st.subheader("Age vs Bmi")
-
-import streamlit as st
-
-# Assuming 'data' is your DataFrame containing the necessary information
+# Add a scatter plot of BMI vs. Weight
+st.subheader("BMI vs Weight")
 
 # Get unique BMI classes
 all_bmi_classes = data['BmiClass'].unique()
 
-# Set the default value to "Obese Class 1" if it exists in the data
-default_bmi_classes = ["Obese Class 1"] if "Obese Class 1" in all_bmi_classes else []
+# Create the multiselect widget for BMI classes with all classes selected by default
+selected_bmi_classes = st.multiselect("Select BMI Classes (You can add more than one class)", all_bmi_classes, default=all_bmi_classes)
 
-# Create the multiselect widget with the default value
-selected_bmi_classes = st.multiselect("Select BMI Classes(You can add more than one class)", all_bmi_classes, default=default_bmi_classes)
+# Filter the data based on selected BMI classes
+filtered_data_scatter_bmi_weight = data[data['BmiClass'].isin(selected_bmi_classes)]
 
-filtered_data_scatter = data[data['BmiClass'].isin(selected_bmi_classes)]
-fig_age_bmi_filtered = px.scatter(filtered_data_scatter, x="Age", y="Bmi", title=f"Age vs. BMI Scatter Plot ({', '.join(selected_bmi_classes)} Classes)", color="BmiClass")
+# Create the scatter plot for BMI vs. Weight
+fig_bmi_weight = px.scatter(
+    filtered_data_scatter_bmi_weight,
+    x="Weight",
+    y="Bmi",
+    title=f"BMI vs. Weight Scatter Plot ({', '.join(selected_bmi_classes)} Classes)",
+    color="BmiClass",
+)
+
 
 # Display the scatter plot
-#st.plotly_chart(fig_age_bmi)
-st.plotly_chart(fig_age_bmi_filtered)
+st.plotly_chart(fig_bmi_weight)
+
+# Display the explanation for the scatter plot
+st.write("The above scatter plot shows the relationship between BMI and Weight. Each point represents an individual, color-coded by BMI class. It helps visualize how weight and BMI are distributed across different BMI classes. There is a positive relationship between bmi and weight since when calculating a bmi value, weight is in the numerator")
+
+# Create a bar plot to show the average BMI for each age group
+st.subheader("Average BMI by Age (Bar Plot)")
+age_bmi_avg = data.groupby("Age")["Bmi"].mean().reset_index()
+fig_bar = px.bar(age_bmi_avg, x="Age", y="Bmi", title="Average BMI by Age (Bar Plot)")
+
+
+# Display the bar plot
+st.plotly_chart(fig_bar)
+
+
+# Display the explanation for the bar plot
+st.write("This bar plot displays the average BMI for each age group. It provides insights into how BMI varies across different age groups, helping to identify potential trends or patterns. For example, the average bmi for age 34 is about 25.")
