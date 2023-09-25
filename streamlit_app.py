@@ -48,7 +48,7 @@ st.write(f"### BMI Class Distribution for Age {selected_age}")
 color_scale = px.colors.sequential.Blues[::-1]
 fig_pie_age = px.pie(
     filtered_data_pie['BmiClass'].value_counts().reset_index(),
-    names='df.index',
+    names='BmiClass',
     values='BmiClass',
     title=f'BMI Class Distribution for Age {selected_age}',
     color_discrete_sequence=color_scale,
